@@ -1,5 +1,9 @@
+// $ gcc -ggdb -W -Wall -I./include -o tst leveldb_example.c -L . -lleveldb -pthread -lstdc++
+
 #include <leveldb/c.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int main() {
     leveldb_t *db;
@@ -49,7 +53,12 @@ int main() {
       return(1);
     }
 
-    printf("key: %s\n", read);
+    char *readbuf = (char *)malloc(read_len + 1);
+    memcpy(readbuf, read, read_len);
+    readbuf[read_len] = '\0';
+    free(read); read = NULL;
+    printf("key: %s\n", readbuf);
+    free(readbuf); readbuf = NULL;
 
     leveldb_free(err); err = NULL;
 
@@ -81,6 +90,10 @@ int main() {
     }
 
     leveldb_free(err); err = NULL;
+
+    leveldb_options_destroy(options); options = NULL;
+    leveldb_writeoptions_destroy(woptions); woptions = NULL;
+    leveldb_readoptions_destroy(roptions); roptions = NULL;
 
 
     return(0);
